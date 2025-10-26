@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// Tema dinámico (sin provider)
-import 'core/theme/theme_controller.dart';
-import 'core/theme/theme_scope.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/theme/theme_provider.dart';
 import 'core/router/app_router.dart';
 
 // Auth y repos
@@ -21,14 +19,6 @@ Future<void> main() async {
 
   // Precargar SharedPreferences (tema)
   final prefs = await SharedPreferences.getInstance();
-  final isDark = prefs.getBool('isDarkMode') ?? false;
-  final colorIndex = prefs.getInt('selectedColor') ?? 0;
-
-  final themeController = ThemeController.preloaded(
-    prefs,
-    isDarkMode: isDark,
-    selectedColor: colorIndex,
-  );
 
   // Inicializar repos basados en Floor
   final usersRepo = LocalUsersRepository();
@@ -95,36 +85,27 @@ Future<void> main() async {
 
   final GoRouter appRouter = AppRouter(auth, winesRepo).router;
 
-  runApp(AppRoot(
-    themeController: themeController,
-    router: appRouter,
+  runApp(ProviderScope(
+    overrides: [sharedPrefsProvider.overrideWithValue(prefs)],
+    child: AppRoot(
+      router: appRouter,
+    ),
   ));
 }
 
-class AppRoot extends StatelessWidget {
-  const AppRoot({
-    super.key,
-    required this.themeController,
-    required this.router,
-  });
+class AppRoot extends ConsumerWidget {
+  const AppRoot({super.key, required this.router});
 
-  final ThemeController themeController;
   final GoRouter router;
 
   @override
-  Widget build(BuildContext context) {
-    return ThemeScope(
-      controller: themeController,
-      child: AnimatedBuilder(
-        animation: themeController,
-        builder: (_, __) {
-          return MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            theme: themeController.themeData,
-            routerConfig: router,
-          );
-        },
-      ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(themeNotifierProvider);
+
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      theme: theme.getTheme(),
+      routerConfig: router,
     );
   }
 }
