@@ -1,7 +1,6 @@
 // core/router/app_router.dart (fragmento)
 import 'package:go_router/go_router.dart';
 import 'package:wine_app/presentation/screen/add_edit_item.dart';
-import 'package:wine_app/presentation/screen/home.dart';
 import 'package:wine_app/presentation/screen/login.dart';
 import 'package:wine_app/presentation/screen/profile.dart';
 import 'package:wine_app/presentation/screen/settings.dart';

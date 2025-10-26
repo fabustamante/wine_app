@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:wine_app/domain/user.dart';
 import 'package:wine_app/presentation/components/drawer_menu.dart';
 import 'package:wine_app/services/auth_service.dart';
