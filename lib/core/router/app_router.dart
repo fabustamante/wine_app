@@ -1,50 +1,54 @@
-// core/router/app_router.dart (fragmento)
 import 'package:go_router/go_router.dart';
-import 'package:wine_app/presentation/screen/add_edit_item.dart';
-import 'package:wine_app/presentation/screen/login.dart';
-import 'package:wine_app/presentation/screen/profile.dart';
-import 'package:wine_app/presentation/screen/settings.dart';
-import 'package:wine_app/presentation/screen/wine_detail_screen.dart';
-import 'package:wine_app/presentation/screen/wine_screen.dart';
-import '../../services/auth_service.dart';
-import '../../data/wines_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../services/auth_provider.dart';
+import '../../services/wines_provider.dart';
 import '../../domain/wine.dart';
+import '../../presentation/screen/add_edit_item.dart';
+import '../../presentation/screen/login.dart';
+import '../../presentation/screen/profile.dart';
+import '../../presentation/screen/settings.dart';
+import '../../presentation/screen/wine_detail_screen.dart';
+import '../../presentation/screen/wine_screen.dart';
+import 'router_notifier.dart';
 
+final routerProvider = Provider<GoRouter>((ref) {
+  final winesRepo = ref.watch(winesRepositoryProvider);
 
-class AppRouter {
-  AppRouter(this.auth, this.winesRepo);
-
-  final AuthService auth;
-  final WinesRepository winesRepo;
-
-  late final router = GoRouter(
+  return GoRouter(
     initialLocation: '/login',
+    refreshListenable: RouterNotifier(ref),
+    redirect: (context, state) {
+      final authStatus = ref.read(authProvider);
+      final loggedIn = authStatus.isAuthenticated;
+      final loggingIn = state.matchedLocation == '/login';
+
+      if (!loggedIn && !loggingIn) return '/login';
+      if (loggedIn && loggingIn) return '/wines';
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/login',
-        builder: (context, state) => LoginScreen(auth: auth),
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
         path: '/profile',
-        builder: (context, state) => ProfileScreen(auth: auth),
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: '/settings',
-        builder: (context, state) => SettingsScreen(auth: auth),
+        builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
         path: '/wines',
-        builder: (context, state) => WineScreen(auth: auth, winesRepo: winesRepo),
+        builder: (context, state) => WineScreen(winesRepo: winesRepo),
       ),
       GoRoute(
         path: '/add_item',
         builder: (context, state) {
           final Wine? initial = state.extra as Wine?;
           return AddEditItemScreen(
-            auth: auth,
-            winesRepo: winesRepo,
             initialWine: initial,
-            // Si no viene initial => se llamó desde la lista: precargar ejemplo
             prefillExample: initial == null,
           );
         },
@@ -54,7 +58,6 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return WineDetailScreen(
-            auth: auth,
             winesRepo: winesRepo,
             wineId: id,
           );
@@ -62,78 +65,4 @@ class AppRouter {
       ),
     ],
   );
-}
-
-
-
-/* import 'package:go_router/go_router.dart';
-import 'package:wine_app/domain/wine.dart';
-import 'package:wine_app/presentation/screen/add_edit_item.dart';
-import 'package:wine_app/presentation/screen/home.dart';
-import 'package:wine_app/presentation/screen/login.dart';
-import 'package:wine_app/presentation/screen/profile.dart';
-import 'package:wine_app/presentation/screen/settings.dart';
-import 'package:wine_app/presentation/screen/wine_detail_screen.dart';
-import 'package:wine_app/presentation/screen/wine_screen.dart';
-import 'package:wine_app/services/auth_service.dart';
-
-class AppRouter {
-  AppRouter(this.auth);
-
-  final AuthService auth;
-
-  late final GoRouter router = GoRouter(
-    initialLocation: '/login',
-    refreshListenable: auth, // <- se reconstruye si cambia el login
-    redirect: (context, state) {
-      final loggedIn = auth.isLoggedIn;
-      final loggingIn = state.matchedLocation == '/login';
-
-      if (!loggedIn && !loggingIn) return '/login';
-      if (loggedIn && loggingIn) return '/home';
-      return null;
-    },
-    routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => LoginScreen(auth: auth),
-      ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => HomeScreen(auth: auth),
-      ),
-      GoRoute(
-        path: '/wine_list',
-        builder: (context, state) => WineScreen(auth: auth),
-      ),
-      GoRoute(
-        path: '/wine_detail',
-        builder:(context, state) => WineDetailScreen(wine: state.extra as Wine), 
-      ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => ProfileScreen(auth: auth),
-      ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => SettingsScreen(auth: auth),
-      ),
-      GoRoute(
-        path: '/add_item',
-        builder: (context, state) {
-        // Si quisieras, podés pasar bool en extra para prellenar ejemplo
-        final prefill = (state.extra as bool?) ?? false;
-        return AddEditItemScreen(prefillExample: prefill, auth: auth);
-        },
-      ),
-      GoRoute(
-        path: '/edit_item',
-        builder: (context, state) {
-        final wine = state.extra as Wine;
-        return AddEditItemScreen(initialWine: wine, auth: auth);
-        }
-      )
-    ],
-  );
-}
- */
+});
