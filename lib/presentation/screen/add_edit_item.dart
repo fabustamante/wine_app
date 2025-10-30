@@ -1,29 +1,25 @@
 // lib/presentation/screens/add_edit_item_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../services/auth_service.dart';
-import '../../data/wines_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/wine.dart';
+import 'package:wine_app/services/wines_provider.dart';
 
-class AddEditItemScreen extends StatefulWidget {
+class AddEditItemScreen extends ConsumerStatefulWidget {
   const AddEditItemScreen({
     super.key,
-    required this.auth,
-    required this.winesRepo,
     this.initialWine,
     this.prefillExample = false,
   });
 
-  final AuthService auth;
-  final WinesRepository winesRepo;
   final Wine? initialWine;
   final bool prefillExample;
 
   @override
-  State<AddEditItemScreen> createState() => _AddEditItemScreenState();
+  ConsumerState<AddEditItemScreen> createState() => _AddEditItemScreenState();
 }
 
-class _AddEditItemScreenState extends State<AddEditItemScreen> {
+class _AddEditItemScreenState extends ConsumerState<AddEditItemScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameCtrl;
   late final TextEditingController _yearCtrl;
@@ -95,10 +91,11 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
       pictureUrl: _imageUrlCtrl.text.trim().isEmpty ? null : _imageUrlCtrl.text.trim(),
     );
 
+    final winesRepo = ref.read(winesRepositoryProvider);
     if (isEdit) {
-      await widget.winesRepo.update(wine);
+      await winesRepo.update(wine);
     } else {
-      await widget.winesRepo.insert(wine);
+      await winesRepo.insert(wine);
     }
 
     if (mounted) context.pop(true); // devolvemos "hubo cambios"

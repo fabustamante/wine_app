@@ -1,24 +1,26 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wine_app/core/menu/menu_item.dart';
-import 'package:wine_app/services/auth_service.dart';
+import 'package:wine_app/presentation/viewmodels/auth_viewmodel.dart';
 
-class DrawerMenu extends StatefulWidget {
-  final AuthService auth;
-
-  const DrawerMenu({super.key, required this.auth});
+class DrawerMenu extends ConsumerStatefulWidget {
+  const DrawerMenu({super.key});
 
   @override
-  State<DrawerMenu> createState() => _DrawerMenuState();
+  ConsumerState<DrawerMenu> createState() => _DrawerMenuState();
 }
 
-class _DrawerMenuState extends State<DrawerMenu> {
+class _DrawerMenuState extends ConsumerState<DrawerMenu> {
   int _selectedIndex = 0;
- // AuthService auth = widget.auth;
+
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme; 
+    final textStyle = Theme.of(context).textTheme;
+    final authState = ref.watch(authProvider);
+    final username = authState.user?.username ?? 'User';
+
     return NavigationDrawer(
       selectedIndex: _selectedIndex,
       onDestinationSelected: (index) {
@@ -28,46 +30,38 @@ class _DrawerMenuState extends State<DrawerMenu> {
         context.go(menu[index].path);
       },
       children: [
-        const DrawerHeader(
+        DrawerHeader(
           child: Column(
             children: [
-              //Text('Menu'),
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 48,
                 child: Text('Wine App'),
-                )
+              ),
+              const SizedBox(height: 8),
+              Text(username, style: textStyle.titleMedium),
             ],
           ),
         ),
-        ...menu
-            .map(
-              (item) => NavigationDrawerDestination(
-                icon: Icon(item.icon),
-                label: Text(item.title),
-              ),
-            )
-            .toList(),
+        ...menu.map(
+          (item) => NavigationDrawerDestination(
+            icon: Icon(item.icon),
+            label: Text(item.title),
+          ),
+        ),
         const Divider(),
-        _LogoutTile(textStyle: textStyle, auth: widget.auth),
-        
+        _LogoutTile(textStyle: textStyle),
       ],
     );
   }
 }
 
-
-class _LogoutTile extends StatelessWidget {
-  const _LogoutTile({
-    super.key,
-    required this.textStyle,
-    required this.auth,
-  });
+class _LogoutTile extends ConsumerWidget {
+  const _LogoutTile({required this.textStyle});
 
   final TextTheme textStyle;
-  final AuthService auth;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
       leading: const Icon(Icons.logout),
       title: Text('Log Out', style: textStyle.bodySmall),
@@ -93,13 +87,13 @@ class _LogoutTile extends StatelessWidget {
 
         if (!confirmed) return;
 
-        // Cerrar el Drawer si está abierto (por seguridad)
         final scaffold = Scaffold.maybeOf(context);
         if (scaffold?.isDrawerOpen ?? false) {
-          Navigator.of(context).pop(); // cierra el Drawer
+          Navigator.of(context).pop();
         }
 
-        auth.signOut();
+        // Sign out via auth viewmodel
+        ref.read(authProvider.notifier).signOut();
 
         if (!context.mounted) return;
 
@@ -111,40 +105,8 @@ class _LogoutTile extends StatelessWidget {
             ),
           );
 
-        context.go('/login'); // el redirect por auth igual te protege
+        context.go('/login');
       },
     );
   }
 }
-
-
-/* class _LogoutTile extends StatelessWidget {
-  const _LogoutTile({
-    super.key,
-    required this.textStyle,
-    required this.auth,
-  });
-
-  final TextTheme textStyle;
-  
-  final AuthService auth;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.logout),
-      title: Text('Log Out', style: textStyle.bodySmall),
-      onTap: () {
-        auth.signOut();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Center(
-                child: Text('Sesión cerrada correctamente'),
-              ),
-            ),
-          );
-          context.go('/login'); // redirect también te mandaría
-      } ,
-    );
-  }
-} */

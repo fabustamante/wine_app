@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wine_app/services/auth_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wine_app/presentation/viewmodels/auth_viewmodel.dart';
 
-
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.auth});
-  final AuthService auth;
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   // Controladores
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -27,10 +26,11 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _submit() async {
     setState(() => _loading = true);
     try {
-      final ok = await widget.auth.signIn(
+      final ok = await ref.read(authProvider.notifier).signIn(
         _usernameController.text,
         _passwordController.text,
       );
+
       if (!mounted) return;
 
       if (!ok) {
@@ -39,10 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         return;
       }
-      // No hace falta push/go: el redirect del router te lleva a /home
+
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Center(child: Text('Bienvenido ${_usernameController.text}!'))),
-        );
+        SnackBar(content: Center(child: Text('Bienvenido ${_usernameController.text}!'))),
+      );
       context.go('/wines');
     } finally {
       if (mounted) setState(() => _loading = false);

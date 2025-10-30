@@ -3,12 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wine_app/core/theme/app_theme.dart';
 import 'package:wine_app/core/theme/theme_provider.dart';
 import 'package:wine_app/presentation/components/drawer_menu.dart';
-import 'package:wine_app/services/auth_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
-  final AuthService auth;
-
-  const SettingsScreen({super.key, required this.auth});
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -71,7 +68,7 @@ class SettingsScreen extends ConsumerWidget {
                           padding: const EdgeInsets.all(6.0),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withAlpha(230),
                               shape: BoxShape.circle,
                             ),
                             padding: const EdgeInsets.all(2),
@@ -97,7 +94,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
-      drawer: DrawerMenu(auth: auth),
+      drawer: const DrawerMenu(),
     );
   }
 }

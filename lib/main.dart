@@ -5,8 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/router/app_router.dart';
 
-// Auth y repos
-import 'services/auth_service.dart';
+// repos
 import 'data/users_repository.dart';     // <-- trae LocalUsersRepository
 import 'data/wines_repository.dart';     // <-- trae LocalWinesRepository
 
@@ -80,10 +79,7 @@ Future<void> main() async {
     ]);
   }
 
-  // AuthService con repo de usuarios en DB
-  final auth = AuthService(usersRepo);
-
-  final GoRouter appRouter = AppRouter(auth, winesRepo).router;
+  final GoRouter appRouter = router;
 
   runApp(ProviderScope(
     overrides: [sharedPrefsProvider.overrideWithValue(prefs)],
