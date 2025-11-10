@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/router/app_router.dart';
+import 'data/app_database.dart';
+import 'data/providers.dart';
 
 // repos
 import 'data/users_repository.dart';     // <-- trae LocalUsersRepository
@@ -81,8 +83,17 @@ Future<void> main() async {
 
   final GoRouter appRouter = router;
 
+  // Create database instance
+  final database = await $FloorAppDatabase
+    .databaseBuilder('app_database.db')
+    .addMigrations([])
+    .build();
+
   runApp(ProviderScope(
-    overrides: [sharedPrefsProvider.overrideWithValue(prefs)],
+    overrides: [
+      sharedPrefsProvider.overrideWithValue(prefs),
+      databaseProvider.overrideWithValue(database),
+    ],
     child: AppRoot(
       router: appRouter,
     ),

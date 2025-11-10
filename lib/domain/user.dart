@@ -1,4 +1,3 @@
-// lib/domain/user.dart
 import 'package:floor/floor.dart';
 
 @entity
@@ -19,30 +18,41 @@ class User {
     this.age,
     this.avatarPath,
   });
+
+  User copyWith({
+    int? id,
+    String? username,
+    String? password,
+    String? email,
+    int? age,
+    String? avatarPath,
+  }) {
+    return User(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      password: password ?? this.password,
+      email: email ?? this.email,
+      age: age ?? this.age,
+      avatarPath: avatarPath ?? this.avatarPath,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'username': username,
+        'password': password,
+        'email': email,
+        'age': age,
+        'avatarPath': avatarPath,
+      };
+
+  factory User.fromJson(Map<String, dynamic> json) => User(
+        id: json['id'] as int,
+        username: json['username'] as String,
+        password: json['password'] as String,
+        email: json['email'] as String,
+        age: json['age'] as int?,
+        avatarPath: json['avatarPath'] as String?,
+      );
 }
-
-// Si usabas una lista "users" de ejemplo, podés conservarla temporalmente
-// para seedear o para debug, pero ya no será la fuente de verdad.
-
-
-List <User> users = [
-  User(
-      id: 1,
-      username: 'user',
-      password: 'password',
-      email: 'user@gmail.com',
-      age: 25),
-  User(
-      id: 2,
-      username: 'admin',
-      password: 'admin123',
-      email: 'admin@gmail.com',
-      age: 30),
-  User(
-      id: 3,
-      username: 'guest',
-      password: 'guest123',
-      email: 'guest@gmail.com',
-      age: 20)
-];
   

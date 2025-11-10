@@ -1,4 +1,3 @@
-// lib/domain/wine.dart
 import 'package:floor/floor.dart';
 
 @entity
@@ -23,54 +22,48 @@ class Wine {
     required this.description,
     this.pictureUrl,
   });
+
+  Wine copyWith({
+    String? id,
+    String? name,
+    String? year,
+    String? grapes,
+    String? country,
+    String? region,
+    String? description,
+    String? pictureUrl,
+  }) {
+    return Wine(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      year: year ?? this.year,
+      grapes: grapes ?? this.grapes,
+      country: country ?? this.country,
+      region: region ?? this.region,
+      description: description ?? this.description,
+      pictureUrl: pictureUrl ?? this.pictureUrl,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'year': year,
+        'grapes': grapes,
+        'country': country,
+        'region': region,
+        'description': description,
+        'pictureUrl': pictureUrl,
+      };
+
+  factory Wine.fromJson(Map<String, dynamic> json) => Wine(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        year: json['year'] as String,
+        grapes: json['grapes'] as String,
+        country: json['country'] as String,
+        region: json['region'] as String,
+        description: json['description'] as String,
+        pictureUrl: json['pictureUrl'] as String?,
+      );
 }
-
-/* class Wine {
-  final String id;
-  final String name;
-  final String year;
-  final String grapes;
-  final String country;
-  final String region;
-  final String description;
-  final String? pictureUrl;
-
-  Wine({
-    required this.id,
-    required this.name,
-    required this.year,
-    required this.grapes,
-    required this.country,
-    required this.region,
-    required this.description,
-    this.pictureUrl,
-  });
-}
-
-List<Wine> winesList = [
-  Wine(
-    id: '1',
-    name: 'Chateau Margaux',
-    year: '2015',
-    grapes: 'Cabernet Sauvignon, Merlot',
-    country: 'France',
-    region: 'Bordeaux',
-    description:
-        'A rich and complex wine with notes of blackberry, plum, and oak.',
-    pictureUrl:
-        'https://www.wine-searcher.com/images/labels/48/46/10934846.jpg',
-  ),
-  Wine(
-    id: '2',
-    name: 'Screaming Eagle',
-    year: '2016',
-    grapes: 'Cabernet Sauvignon',
-    country: 'USA',
-    region: 'Napa Valley',
-    description:
-        'An exquisite wine with flavors of dark fruit, chocolate, and spice.',
-    pictureUrl:
-        'https://www.wine-searcher.com/images/labels/90/78/10399078.jpg',
-  ),
-  // Add more sample wines as needed
-]; */

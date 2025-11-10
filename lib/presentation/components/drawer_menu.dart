@@ -87,6 +87,8 @@ class _LogoutTile extends ConsumerWidget {
 
         if (!confirmed) return;
 
+        if (!context.mounted) return;
+
         final scaffold = Scaffold.maybeOf(context);
         if (scaffold?.isDrawerOpen ?? false) {
           Navigator.of(context).pop();
@@ -97,7 +99,11 @@ class _LogoutTile extends ConsumerWidget {
 
         if (!context.mounted) return;
 
-        ScaffoldMessenger.of(context)
+        // Mostrar mensaje y navegar
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
+        final router = GoRouter.of(context);
+        
+        scaffoldMessenger
           ..hideCurrentSnackBar()
           ..showSnackBar(
             const SnackBar(
@@ -105,7 +111,7 @@ class _LogoutTile extends ConsumerWidget {
             ),
           );
 
-        context.go('/login');
+        router.go('/login');
       },
     );
   }
