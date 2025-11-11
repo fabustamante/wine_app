@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../domain/repositories/wines_repository.dart';
 import '../../../domain/wine.dart';
 import '../../../data/providers.dart';
 
