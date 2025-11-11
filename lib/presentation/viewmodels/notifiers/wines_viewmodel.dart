@@ -39,6 +39,13 @@ class WinesViewModel extends AsyncNotifier<List<Wine>> {
       return repository.getAll();
     });
   }
+
+  /// Return a single wine by id. Useful for detail screens that want
+  /// to load a single item without directly reading the repository.
+  Future<Wine?> getById(String id) async {
+    final repository = ref.read(winesRepositoryProvider);
+    return repository.getById(id);
+  }
 }
 
 final winesViewModelProvider = AsyncNotifierProvider<WinesViewModel, List<Wine>>(

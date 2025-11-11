@@ -9,7 +9,7 @@ import 'data/providers.dart';
 
 // repos
 import 'data/users_repository.dart';     // <-- trae LocalUsersRepository
-import 'data/wines_repository.dart';     // <-- trae LocalWinesRepository
+import 'data/repositories/wines_repository_impl.dart';
 
 // Entidades (para seed)
 import 'domain/user.dart';
@@ -23,7 +23,6 @@ Future<void> main() async {
 
   // Inicializar repos basados en Floor
   final usersRepo = LocalUsersRepository();
-  final winesRepo = LocalWinesRepository();
 
   // Seed inicial si las tablas están vacías
   // Usuarios
@@ -54,10 +53,19 @@ Future<void> main() async {
     ]);
   }
 
-  // Vinos
+  // Vinos: we'll create the database instance first and use the repository implementation
+
+  // Create database instance (needed for wines repository and app)
+  final database = await $FloorAppDatabase
+    .databaseBuilder('app_database.db')
+    .addMigrations([])
+    .build();
+
+  // Seed wines using repository implementation bound to the created database
+  final winesRepo = LocalWinesRepository(database);
   final existingWines = await winesRepo.getAll();
   if (existingWines.isEmpty) {
-    await winesRepo.insertMany(<Wine>[
+    await winesRepo.insert(
       Wine(
         id: 'catena-malbec-2020',
         name: 'Catena Malbec',
@@ -68,6 +76,8 @@ Future<void> main() async {
         description: 'Malbec mendocino con fruta roja y buena estructura.',
         pictureUrl: null,
       ),
+    );
+    await winesRepo.insert(
       Wine(
         id: 'trapiche-oak-cask-2019',
         name: 'Trapiche Oak Cask Malbec',
@@ -78,16 +88,10 @@ Future<void> main() async {
         description: 'Clásico Malbec con paso por roble.',
         pictureUrl: null,
       ),
-    ]);
+    );
   }
 
   final GoRouter appRouter = router;
-
-  // Create database instance
-  final database = await $FloorAppDatabase
-    .databaseBuilder('app_database.db')
-    .addMigrations([])
-    .build();
 
   runApp(ProviderScope(
     overrides: [

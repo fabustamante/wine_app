@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wine_app/domain/wine.dart';
-import 'package:wine_app/services/wines_provider.dart';
+import 'package:wine_app/presentation/viewmodels/notifiers/wines_viewmodel.dart';
 
 class WineDetailScreen extends ConsumerStatefulWidget {
   const WineDetailScreen({
@@ -22,12 +22,12 @@ class _WineDetailScreenState extends ConsumerState<WineDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _futureWine = ref.read(winesRepositoryProvider).getById(widget.wineId);
+    _futureWine = ref.read(winesViewModelProvider.notifier).getById(widget.wineId);
   }
 
   Future<void> _reload() async {
     setState(() {
-      _futureWine = ref.read(winesRepositoryProvider).getById(widget.wineId);
+      _futureWine = ref.read(winesViewModelProvider.notifier).getById(widget.wineId);
     });
   }
 
@@ -79,8 +79,8 @@ class _WineDetailScreenState extends ConsumerState<WineDetailScreen> {
                           ),
                         );
                         if (ok != true || !mounted) return;
-                        
-                        await ref.read(winesRepositoryProvider).delete(wine);
+
+                        await ref.read(winesViewModelProvider.notifier).deleteWine(wine);
                         context.pop();
                       },
               ),

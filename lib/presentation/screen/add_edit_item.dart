@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/wine.dart';
-import 'package:wine_app/services/wines_provider.dart';
+import 'package:wine_app/presentation/viewmodels/notifiers/wines_viewmodel.dart';
 
 class AddEditItemScreen extends ConsumerStatefulWidget {
   const AddEditItemScreen({
@@ -91,11 +91,11 @@ class _AddEditItemScreenState extends ConsumerState<AddEditItemScreen> {
       pictureUrl: _imageUrlCtrl.text.trim().isEmpty ? null : _imageUrlCtrl.text.trim(),
     );
 
-    final winesRepo = ref.read(winesRepositoryProvider);
+    final winesVm = ref.read(winesViewModelProvider.notifier);
     if (isEdit) {
-      await winesRepo.update(wine);
+      await winesVm.updateWine(wine);
     } else {
-      await winesRepo.insert(wine);
+      await winesVm.addWine(wine);
     }
 
     if (mounted) context.pop(true); // devolvemos "hubo cambios"
