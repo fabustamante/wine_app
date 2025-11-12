@@ -1,7 +1,7 @@
 // lib/data/users_repository.dart
-import '../domain/user.dart';
-import 'app_database.dart';
-import 'users_dao.dart';
+import '../../domain/user.dart';
+import '../app_database.dart';
+import '../users_dao.dart';
 
 abstract class UsersRepository {
   Future<User?> findByCredentials(String username, String password);
@@ -37,25 +37,3 @@ class LocalUsersRepository implements UsersRepository {
   }
 }
 
-
-/* import '../domain/user.dart';
-import 'dart:async';
-import 'package:collection/collection.dart';
-
-abstract class UsersRepository {
-  /// Devuelve el usuario si username/password coinciden; null si no.
-  Future<User?> findByCredentials(String username, String password);
-}
-
-class InMemoryUsersRepository implements UsersRepository {
-  final List<User> _users;
-  InMemoryUsersRepository(this._users);
-
-  @override
-  Future<User?> findByCredentials(String username, String password) async {
-    await Future<void>.delayed(const Duration(milliseconds: 1000));
-    return _users.firstWhereOrNull(
-      (u) => u.username == username && u.password == password,
-    );
-  }
-} */
