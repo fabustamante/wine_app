@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "899194329082",
+    "project_id": "wineapp-651cf",
+    "storage_bucket": "wineapp-651cf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899194329082:android:e2a49bf7dceb8b15e77643",
+        "android_client_info": {
+          "package_name": "com.example.wine_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDq5bkTwZB62ePuvZh67uoRB7mT683-XO0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

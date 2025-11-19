@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../domain/user.dart';
-import '../data/users_repository.dart';
+import '../data/repositories/users_repository.dart';
 
 class AuthService extends ChangeNotifier {
   final UsersRepository _repo;

@@ -1,0 +1,41 @@
+mutation AddProductToCart($userId: UUID!, $productId: UUID!, $quantity: Int!) @auth(level: USER) {
+  cartItem_insert(data: {userId: $userId, productId: $productId, quantity: $quantity, dateAdded_expr: "request.time"})
+}
+
+query GetProductById($id: UUID!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  product(id: $id) {
+    id
+    name
+    description
+    price
+    imageUrl
+    stockQuantity
+    category
+    seller {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+query ListProductsByCategory($category: String!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  products(where: {category: {eq: $category}}) {
+    id
+    name
+    description
+    price
+    imageUrl
+    stockQuantity
+    category
+    seller {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+mutation CreateReview($productId: UUID!, $rating: Int!, $comment: String!) @auth(level: USER) {
+  review_insert(data: {productId: $productId, reviewerId_expr: "auth.uid", rating: $rating, comment: $comment, reviewDate_expr: "request.time"})
+}

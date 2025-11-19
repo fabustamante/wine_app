@@ -1,11 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/users_repository.dart';
 import '../../domain/user.dart';
-
-// Simple provider for UsersRepository (can be moved later to services layer)
-final usersRepositoryProvider = Provider<UsersRepository>((ref) {
-  return LocalUsersRepository();
-});
+import '../../data/providers.dart';
 
 enum AuthState {
   initial,
