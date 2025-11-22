@@ -20,7 +20,7 @@ class UsersFirestoreRepository implements UsersRepository {
       password: data['password'] as String? ?? '',
       email: data['email'] as String? ?? '',
       age: (data['age'] as num?)?.toInt(),
-      avatarPath: data['avatarPath'] as String?,
+      avatarUrl: data['avatarUrl'] as String?,
     );
   }
 
@@ -32,7 +32,7 @@ class UsersFirestoreRepository implements UsersRepository {
       'password': user.password,
       'email': user.email,
       'age': user.age,
-      'avatarPath': user.avatarPath,
+      'avatarUrl': user.avatarUrl,
     };
   }
 

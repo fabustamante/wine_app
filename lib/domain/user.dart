@@ -8,7 +8,7 @@ class User {
   String password;
   final String email;
   final int? age;
-  String? avatarPath;
+  String? avatarUrl;
 
   User({
     required this.id,
@@ -16,7 +16,7 @@ class User {
     required this.password,
     required this.email,
     this.age,
-    this.avatarPath,
+    this.avatarUrl,
   });
 
   User copyWith({
@@ -25,7 +25,7 @@ class User {
     String? password,
     String? email,
     int? age,
-    String? avatarPath,
+    String? avatarUrl,
   }) {
     return User(
       id: id ?? this.id,
@@ -33,7 +33,7 @@ class User {
       password: password ?? this.password,
       email: email ?? this.email,
       age: age ?? this.age,
-      avatarPath: avatarPath ?? this.avatarPath,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 
@@ -43,7 +43,7 @@ class User {
         'password': password,
         'email': email,
         'age': age,
-        'avatarPath': avatarPath,
+        'avatarUrl': avatarUrl,
       };
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -52,7 +52,7 @@ class User {
         password: json['password'] as String,
         email: json['email'] as String,
         age: json['age'] as int?,
-        avatarPath: json['avatarPath'] as String?,
+        avatarUrl: json['avatarUrl'] as String?,
       );
 }
   

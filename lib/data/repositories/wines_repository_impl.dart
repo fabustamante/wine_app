@@ -1,3 +1,7 @@
+// NOTA: LocalWinesRepository usa Floor (base de datos local)
+// El proyecto actualmente usa WinesFirestoreRepository (lib/data/repositories/wines_repository_firestore.dart)
+// Se mantiene comentado para referencia futura si se necesita soporte offline
+/*
 import '../../domain/wine.dart';
 import '../../domain/repositories/wines_repository.dart';
 import '../app_database.dart';
@@ -30,3 +34,4 @@ class LocalWinesRepository implements WinesRepository {
   @override
   Future<void> update(Wine wine) => _db.winesDao.updateOne(wine);
 }
+*/

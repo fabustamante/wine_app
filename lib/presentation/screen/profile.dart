@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wine_app/domain/user.dart';
 import 'package:wine_app/presentation/components/drawer_menu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wine_app/presentation/viewmodels/auth_viewmodel.dart';
+import 'package:wine_app/presentation/viewmodels/profile_viewmodel.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -30,14 +30,14 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-class _ProfileView extends StatelessWidget {
+class _ProfileView extends ConsumerWidget {
   final User user;
 
   const _ProfileView({
     required this.user,
   });
 
-  Future<void> _pickAvatar(BuildContext context) async {
+  Future<void> _pickAvatar(BuildContext context, WidgetRef ref) async {
     final scaffold = ScaffoldMessenger.of(context);
     
     final x = await ImagePicker().pickImage(
@@ -45,11 +45,23 @@ class _ProfileView extends StatelessWidget {
       imageQuality: 80,
     );
     if (x == null) return;
-    
-    user.avatarPath = x.path;
-    scaffold
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('Avatar updated')));
+
+    // Usar el ViewModel para actualizar el avatar
+    final success = await ref.read(profileProvider.notifier).updateAvatar(
+      imagePath: x.path,
+      currentUser: user,
+    );
+
+    if (success) {
+      scaffold
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Avatar actualizado exitosamente')));
+    } else {
+      final errorMessage = ref.read(profileProvider).errorMessage ?? 'Error al actualizar avatar';
+      scaffold
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(errorMessage)));
+    }
   }
 
   Future<void> _resetPass(BuildContext context) async {
@@ -60,8 +72,9 @@ class _ProfileView extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final avatarExists = user.avatarPath != null && File(user.avatarPath!).existsSync();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileState = ref.watch(profileProvider);
+    final isUploading = profileState.avatarState == AvatarUpdateState.uploading;
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -69,15 +82,33 @@ class _ProfileView extends StatelessWidget {
         Center(
           child: Column(
             children: [
-              GestureDetector(
-                onTap: () async {
-                  await _pickAvatar(context);
-                },
-                child: CircleAvatar(
-                  radius: 48,
-                  backgroundImage: avatarExists ? FileImage(File(user.avatarPath!)) : null,
-                  child: avatarExists ? null : const Icon(Icons.person, size: 40),
-                ),
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: isUploading ? null : () async {
+                      await _pickAvatar(context, ref);
+                    },
+                    child: CircleAvatar(
+                      radius: 48,
+                      backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+                          ? NetworkImage(user.avatarUrl!)
+                          : null,
+                      child: user.avatarUrl == null || user.avatarUrl!.isEmpty
+                          ? const Icon(Icons.person, size: 40)
+                          : null,
+                    ),
+                  ),
+                  if (isUploading)
+                    Positioned.fill(
+                      child: CircleAvatar(
+                        radius: 48,
+                        backgroundColor: Colors.black54,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 12),
               Text(

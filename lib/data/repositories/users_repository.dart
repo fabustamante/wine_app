@@ -1,7 +1,7 @@
 // lib/data/users_repository.dart
 import '../../domain/user.dart';
-import '../app_database.dart';
-import '../users_dao.dart';
+// import '../app_database.dart'; // Comentado - usando Firestore
+// import '../users_dao.dart'; // Comentado - usando Firestore
 
 abstract class UsersRepository {
   Future<User?> findByCredentials(String username, String password);
@@ -9,6 +9,10 @@ abstract class UsersRepository {
   Future<void> insertMany(List<User> seed);
 }
 
+// NOTA: LocalUsersRepository usa Floor (base de datos local)
+// El proyecto actualmente usa UsersFirestoreRepository
+// Se mantiene comentado para referencia futura si se necesita soporte offline
+/*
 class LocalUsersRepository implements UsersRepository {
   AppDatabase? _db;
   UsersDao? _dao;
@@ -36,4 +40,5 @@ class LocalUsersRepository implements UsersRepository {
     return _dao!.insertMany(seed);
   }
 }
+*/
 

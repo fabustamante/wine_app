@@ -152,6 +152,13 @@ class AuthNotifier extends Notifier<AuthStatus> {
   Future<bool> signIn(String email, String password) async {
     return signInWithEmailAndPassword(email, password);
   }
+
+  /// Actualizar información del usuario actual
+  void updateUser(User updatedUser) {
+    if (state.user != null) {
+      state = state.copyWith(user: updatedUser);
+    }
+  }
 }
 
 final authProvider = NotifierProvider<AuthNotifier, AuthStatus>(AuthNotifier.new);

@@ -120,14 +120,14 @@ class FirebaseAuthService {
             username: googleUser.displayName ?? googleUser.email.split('@')[0],
             email: googleUser.email,
             password: '',
-            avatarPath: googleUser.photoUrl,
+            avatarUrl: googleUser.photoUrl,
           );
 
           await _firestore.collection('users').doc(userCredential.user!.uid).set({
             'id': user.id,
             'username': user.username,
             'email': user.email,
-            'avatarPath': user.avatarPath,
+            'avatarUrl': user.avatarUrl,
             'createdAt': FieldValue.serverTimestamp(),
           });
 
@@ -164,7 +164,7 @@ class FirebaseAuthService {
       email: data['email'] as String? ?? '',
       password: '',
       age: (data['age'] as num?)?.toInt(),
-      avatarPath: data['avatarPath'] as String?,
+      avatarUrl: data['avatarUrl'] as String?,
     );
   }
 
