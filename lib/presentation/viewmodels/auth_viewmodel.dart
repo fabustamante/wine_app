@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/user.dart';
-import '../../data/providers.dart';
+import '../../services/firebase_auth_service.dart';
 
 enum AuthState {
   initial,
@@ -36,32 +36,121 @@ class AuthStatus {
   }
 }
 
+// Provider del servicio de Firebase Auth
+final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
+  return FirebaseAuthService();
+});
+
 class AuthNotifier extends Notifier<AuthStatus> {
   @override
   AuthStatus build() {
     return const AuthStatus();
   }
 
-  Future<bool> signIn(String username, String password) async {
+  /// Iniciar sesión con correo y contraseña
+  Future<bool> signInWithEmailAndPassword(String email, String password) async {
     state = state.copyWith(state: AuthState.authenticating);
     try {
-      final repo = ref.read(usersRepositoryProvider);
-      final user = await repo.findByCredentials(username.trim(), password.trim());
+      final authService = ref.read(firebaseAuthServiceProvider);
+      final user = await authService.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
       if (user != null) {
         state = AuthStatus(state: AuthState.authenticated, user: user);
         return true;
       } else {
-        state = const AuthStatus(state: AuthState.error, errorMessage: 'Usuario o contraseña incorrectos');
+        state = const AuthStatus(
+          state: AuthState.error,
+          errorMessage: 'Usuario o contraseña incorrectos',
+        );
         return false;
       }
     } catch (e) {
-      state = const AuthStatus(state: AuthState.error, errorMessage: 'Error al intentar iniciar sesión');
+      state = AuthStatus(
+        state: AuthState.error,
+        errorMessage: e.toString(),
+      );
       return false;
     }
   }
 
-  void signOut() {
-    state = const AuthStatus();
+  /// Iniciar sesión con Google
+  Future<bool> signInWithGoogle() async {
+    state = state.copyWith(state: AuthState.authenticating);
+    try {
+      final authService = ref.read(firebaseAuthServiceProvider);
+      final user = await authService.signInWithGoogle();
+      if (user != null) {
+        state = AuthStatus(state: AuthState.authenticated, user: user);
+        return true;
+      } else {
+        // Usuario canceló el sign-in
+        state = const AuthStatus(state: AuthState.initial);
+        return false;
+      }
+    } catch (e) {
+      state = AuthStatus(
+        state: AuthState.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  /// Registrar nuevo usuario
+  Future<bool> signUpWithEmailAndPassword({
+    required String email,
+    required String password,
+    required String username,
+    int? age,
+  }) async {
+    state = state.copyWith(state: AuthState.authenticating);
+    try {
+      final authService = ref.read(firebaseAuthServiceProvider);
+      final user = await authService.signUpWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+        username: username.trim(),
+        age: age,
+      );
+      if (user != null) {
+        state = AuthStatus(state: AuthState.authenticated, user: user);
+        return true;
+      } else {
+        state = const AuthStatus(
+          state: AuthState.error,
+          errorMessage: 'Error al crear la cuenta',
+        );
+        return false;
+      }
+    } catch (e) {
+      state = AuthStatus(
+        state: AuthState.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  /// Cerrar sesión
+  Future<void> signOut() async {
+    try {
+      final authService = ref.read(firebaseAuthServiceProvider);
+      await authService.signOut();
+      state = const AuthStatus();
+    } catch (e) {
+      state = AuthStatus(
+        state: AuthState.error,
+        errorMessage: 'Error al cerrar sesión: $e',
+      );
+    }
+  }
+
+  // Método legacy para compatibilidad (usar email en lugar de username)
+  @Deprecated('Use signInWithEmailAndPassword instead')
+  Future<bool> signIn(String email, String password) async {
+    return signInWithEmailAndPassword(email, password);
   }
 }
 
