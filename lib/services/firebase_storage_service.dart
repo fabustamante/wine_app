@@ -103,6 +103,68 @@ class FirebaseStorageService {
     return newImageUrl;
   }
 
+  /// Sube una imagen de vino y retorna la URL de descarga
+  /// 
+  /// [imagePath] - Ruta local del archivo de imagen
+  /// [wineId] - ID único del vino para nombrar el archivo
+  /// Retorna la URL pública de la imagen subida
+  Future<String> uploadWineImage({
+    required String imagePath,
+    required String wineId,
+  }) async {
+    try {
+      final File file = File(imagePath);
+      
+      // Verificar que el archivo existe
+      if (!await file.exists()) {
+        throw Exception('El archivo de imagen no existe');
+      }
+
+      // Crear una referencia única para la imagen del vino
+      final String fileName = 'wine_${wineId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final Reference storageRef = _storage.ref().child('wine_images').child(fileName);
+
+      // Configurar metadata para la imagen
+      final SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+        customMetadata: {
+          'wineId': wineId,
+          'uploadedAt': DateTime.now().toIso8601String(),
+        },
+      );
+
+      // Subir el archivo
+      final UploadTask uploadTask = storageRef.putFile(file, metadata);
+
+      // Esperar a que se complete la subida
+      final TaskSnapshot snapshot = await uploadTask;
+
+      // Obtener la URL de descarga
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      return downloadUrl;
+    } on FirebaseException catch (e) {
+      throw _handleStorageException(e);
+    } catch (e) {
+      throw 'Error al subir imagen: $e';
+    }
+  }
+
+  /// Elimina una imagen de vino
+  /// 
+  /// [imageUrl] - URL de la imagen a eliminar
+  Future<void> deleteWineImage(String imageUrl) async {
+    try {
+      final Reference storageRef = _storage.refFromURL(imageUrl);
+      await storageRef.delete();
+    } on FirebaseException catch (e) {
+      // Si la imagen no existe, no es un error crítico
+      if (e.code != 'object-not-found') {
+        throw _handleStorageException(e);
+      }
+    }
+  }
+
   /// Maneja excepciones de Firebase Storage
   String _handleStorageException(FirebaseException e) {
     switch (e.code) {

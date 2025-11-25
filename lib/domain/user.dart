@@ -1,8 +1,4 @@
-import 'package:floor/floor.dart';
-
-@entity
 class User {
-  @primaryKey
   final int id;
   final String username;
   String password;
