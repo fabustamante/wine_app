@@ -1,21 +1,19 @@
-// lib/presentation/screens/wine_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wine_app/presentation/components/drawer_menu.dart';
-import '../../services/auth_service.dart';
 import '../../data/wines_repository.dart';
 import '../../domain/wine.dart';
+import '../../presentation/components/drawer_menu.dart';
 
-class WineScreen extends StatefulWidget {
-  const WineScreen({super.key, required this.auth, required this.winesRepo});
-  final AuthService auth;
+class WineScreen extends ConsumerStatefulWidget {
+  const WineScreen({super.key, required this.winesRepo});
   final WinesRepository winesRepo;
 
   @override
-  State<WineScreen> createState() => _WineScreenState();
+  ConsumerState<WineScreen> createState() => _WineScreenState();
 }
 
-class _WineScreenState extends State<WineScreen> {
+class _WineScreenState extends ConsumerState<WineScreen> {
   late Future<List<Wine>> _futureWines;
 
   @override
@@ -118,7 +116,7 @@ class _WineScreenState extends State<WineScreen> {
           );
         },
       ),
-      drawer: DrawerMenu(auth: widget.auth),
+      drawer: const DrawerMenu(),
       floatingActionButton: FloatingActionButton(
         onPressed: _onAddWine,
         child: const Icon(Icons.add),

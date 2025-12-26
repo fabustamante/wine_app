@@ -1,26 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/router/app_router.dart';
 
-// Auth y repos
-import 'services/auth_service.dart';
-import 'data/users_repository.dart';     // <-- trae LocalUsersRepository
-import 'data/wines_repository.dart';     // <-- trae LocalWinesRepository
-
-// Entidades (para seed)
+// Repos y entidades para seed inicial
+import 'data/users_repository.dart';
+import 'data/wines_repository.dart';
 import 'domain/user.dart';
 import 'domain/wine.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Precargar SharedPreferences (tema)
-  final prefs = await SharedPreferences.getInstance();
-
-  // Inicializar repos basados en Floor
+Future<void> _initializeDatabase() async {
   final usersRepo = LocalUsersRepository();
   final winesRepo = LocalWinesRepository();
 
@@ -79,28 +69,30 @@ Future<void> main() async {
       ),
     ]);
   }
+}
 
-  // AuthService con repo de usuarios en DB
-  final auth = AuthService(usersRepo);
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  final GoRouter appRouter = AppRouter(auth, winesRepo).router;
+  // Precargar SharedPreferences (tema)
+  final prefs = await SharedPreferences.getInstance();
+
+  // Inicializar base de datos con datos de prueba
+  await _initializeDatabase();
 
   runApp(ProviderScope(
     overrides: [sharedPrefsProvider.overrideWithValue(prefs)],
-    child: AppRoot(
-      router: appRouter,
-    ),
+    child: const AppRoot(),
   ));
 }
 
 class AppRoot extends ConsumerWidget {
-  const AppRoot({super.key, required this.router});
-
-  final GoRouter router;
+  const AppRoot({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeNotifierProvider);
+    final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

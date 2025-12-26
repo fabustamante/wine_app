@@ -1,27 +1,24 @@
-// lib/presentation/screens/wine_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../services/auth_service.dart';
 import '../../data/wines_repository.dart';
 import '../../domain/wine.dart';
 
-class WineDetailScreen extends StatefulWidget {
+class WineDetailScreen extends ConsumerStatefulWidget {
   const WineDetailScreen({
     super.key,
-    required this.auth,
     required this.winesRepo,
     required this.wineId,
   });
 
-  final AuthService auth;
   final WinesRepository winesRepo;
   final String wineId;
 
   @override
-  State<WineDetailScreen> createState() => _WineDetailScreenState();
+  ConsumerState<WineDetailScreen> createState() => _WineDetailScreenState();
 }
 
-class _WineDetailScreenState extends State<WineDetailScreen> {
+class _WineDetailScreenState extends ConsumerState<WineDetailScreen> {
   late Future<Wine?> _futureWine;
 
   @override
